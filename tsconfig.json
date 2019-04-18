@@ -16,6 +16,14 @@
     "lib": [
       "es2017",
       "dom"
-    ]
+    ],
+    "paths": {
+      "NgxPouchDB": [
+        "dist/ngx-pouch-db"
+      ],
+      "NgxPouchDB/*": [
+        "dist/ngx-pouch-db/*"
+      ]
+    }
   }
 }

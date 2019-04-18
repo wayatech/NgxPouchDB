@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "NgxPouchDB": {
+    "Demo": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/NgxPouchDB",
+            "outputPath": "dist/Demo",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -50,18 +50,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "NgxPouchDB:build"
+            "browserTarget": "Demo:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "NgxPouchDB:build:production"
+              "browserTarget": "Demo:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "NgxPouchDB:build"
+            "browserTarget": "Demo:build"
           }
         },
         "test": {
@@ -95,7 +95,7 @@
         }
       }
     },
-    "NgxPouchDB-e2e": {
+    "Demo-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "architect": {
@@ -103,11 +103,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "NgxPouchDB:serve"
+            "devServerTarget": "Demo:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "NgxPouchDB:serve:production"
+              "devServerTarget": "Demo:serve:production"
             }
           }
         },
@@ -121,7 +121,42 @@
           }
         }
       }
+    },
+    "NgxPouchDB": {
+      "root": "projects/ngx-pouch-db",
+      "sourceRoot": "projects/ngx-pouch-db/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ngx-pouch-db/tsconfig.lib.json",
+            "project": "projects/ngx-pouch-db/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-pouch-db/src/test.ts",
+            "tsConfig": "projects/ngx-pouch-db/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-pouch-db/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-pouch-db/tsconfig.lib.json",
+              "projects/ngx-pouch-db/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
-  "defaultProject": "NgxPouchDB"
+  "defaultProject": "Demo"
 }
