@@ -27,6 +27,9 @@ export class AppComponent implements OnInit {
             {}
         );
 
-        this.ngxPouchDBService.put('main', {test: 1});
+        const doc = {test: 1};
+        this.ngxPouchDBService.put('main', doc).subscribe((data) => {
+            console.log(data, doc);
+        });
     }
 }

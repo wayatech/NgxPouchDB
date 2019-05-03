@@ -2,6 +2,8 @@ import { EventEmitter, Injectable } from '@angular/core';
 import PouchDB from 'pouchdb';
 import LoginPlugin from 'pouchdb-authentication';
 import FindPlugin from 'pouchdb-find';
+import { from } from 'rxjs';
+import { map } from 'rxjs/operators';
 import uuidv4 from 'uuid/v4';
 
 import { Database } from './models/database';
@@ -43,7 +45,7 @@ export class NgxPouchDBService {
     }
 
     public get(key: string, id: string) {
-        return this.databases[key].get(id);
+        return from(this.databases[key].get(id));
     }
 
     public put(key: string, document: any) {
@@ -51,13 +53,13 @@ export class NgxPouchDBService {
             document._id = uuidv4();
         }
 
-        return this.databases[key].put(document);
+        return from(this.databases[key].put(document)).pipe(map(data => { document._rev = data['rev']; return data; }));
     }
 
     public find(key: string, filter) {
         PouchDB.plugin(FindPlugin);
 
-        return this.databases[key].find(filter);
+        return from(this.databases[key].find(filter));
     }
 
     public query(key: string, view: string, queryParams) {
