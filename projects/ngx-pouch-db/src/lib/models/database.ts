@@ -32,6 +32,10 @@ export class Database {
         return this.selectLocalOrRemote().query(view, queryParams);
     }
 
+    public remove(id: string, rev: string) {
+        return this.selectLocalOrRemote().remove(id, rev);
+    }
+
     public replicateFromRemote() {
         const promise = this.local.replicate.from(this.remote);
 

@@ -1,20 +1,32 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
+<h3> Welcome to this tutorial of NgxPouchDb ! </h3>
+
+<p> To begin, we will display the structure of the documents by getting a document with the function <b>get </b> :  </p>
+<pre>{{ structureDoc  }} </pre><br><br>
+
+<p> Then let's get the people who have blue eyes in my database using the function <b> find </b> : </p>
+<pre *ngFor="let people of blueEyesPeople"> {{ people }} </pre><br><br>
+
+<p> Now, we will put a new document in the database with the function <b> put </b> and get him with the function <b> find : </b></p>
+<p> Write the informations to put in the database : </p>
+<div style="display: inline-grid">
+  <label> age  : </label>
+  <input type="text" name="age" [(ngModel)]="toPutInDataBase.age">
+  <label> eyeColor  : </label>
+  <input type="text" name="eyeColor" [(ngModel)]="toPutInDataBase.eyeColor">
+  <label> firstName  : </label>
+  <input type="text" name="firstName" [(ngModel)]="toPutInDataBase.name.first">
+  <label> lastName  : </label>
+  <input type="text" name="lastName" [(ngModel)]="toPutInDataBase.name.last">
+  <label> favoriteFruit  : </label>
+  <input type="text" name="favoriteFruit" [(ngModel)]="toPutInDataBase.favoriteFruit">
+</div><br><br>
+<button  (click)="putData()"> put </button>
+<div *ngIf="isPut">
+  <p> We can see your data has been put in the database, now you can try to delete in it with the function <b>delete</b> : </p>
+  <pre *ngFor="let people of allData"> {{ people }}</pre>
 </div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+
+
+
+
 

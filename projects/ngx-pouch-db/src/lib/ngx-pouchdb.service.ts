@@ -56,6 +56,10 @@ export class NgxPouchDBService {
         return from(this.databases[key].put(document)).pipe(map(data => { document._rev = data['rev']; return data; }));
     }
 
+    public remove(key: string, id: string, rev: string) {
+        return from(this.databases[key].remove(id, rev));
+    }
+
     public find(key: string, filter) {
         PouchDB.plugin(FindPlugin);
 
