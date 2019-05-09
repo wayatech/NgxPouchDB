@@ -49,15 +49,24 @@ export class NgxPouchDBService {
     }
 
     public put(key: string, document: any) {
+        return from(this.databases[key].put(document)).pipe(map(data => { document._rev = data['rev']; return data; }));
+    }
+
+    public remove(key: string, document: any) {
+        console.log(document);
+
+        return from(this.databases[key].remove(document));
+    }
+
+    public create(key: string, document: any) {
         if (!document._id) {
             document._id = uuidv4();
         }
 
-        return from(this.databases[key].put(document)).pipe(map(data => { document._rev = data['rev']; return data; }));
-    }
-
-    public remove(key: string, id: string, rev: string) {
-        return from(this.databases[key].remove(id, rev));
+        return this.put(key, document).pipe(map(data => {
+            delete(document._id);
+            delete(document._rev);
+        }));
     }
 
     public find(key: string, filter) {

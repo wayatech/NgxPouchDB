@@ -32,8 +32,11 @@ export class Database {
         return this.selectLocalOrRemote().query(view, queryParams);
     }
 
-    public remove(id: string, rev: string) {
-        return this.selectLocalOrRemote().remove(id, rev);
+    public remove(document: any) {
+        let doc;
+        Object.assign(doc, document);
+
+        return this.selectLocalOrRemote().remove(doc);
     }
 
     public replicateFromRemote() {

@@ -12,6 +12,8 @@ export class AppComponent implements OnInit {
     structureDoc: String;
     blueEyesPeople: String[] = [];
     allData: String[] = [];
+    idToDelete: string;
+    revToDetelete: string;
 
     toPutInDataBase = {
         age: "",
@@ -25,25 +27,41 @@ export class AppComponent implements OnInit {
 
     constructor(private ngxPouchDBService: NgxPouchDBService) {}
 
-    isPut = false;
 
-    displayAllData() {
-        this.ngxPouchDBService.find('main', {
-            "selector": {
-                "_id": {
-                   "$gt": null
-                }
-             }
-        }).subscribe((data) => {
-            this.allData = data.docs.map(element => JSON.stringify(element));
-        })
-    }
+    isPut = false;
+    isDelete = false;
+
     // put data into the database
     putData()
     {
-        this.ngxPouchDBService.put('main',this.toPutInDataBase);
-        this.displayAllData();
+        this.ngxPouchDBService.create('main', this.toPutInDataBase).subscribe(() => {
+            this.ngxPouchDBService.find('main', {
+                "selector": {
+                    "_id": {
+                       "$gt": null
+                    }
+                 }
+            }).subscribe((data) => {
+                this.allData = data.docs.map(element => JSON.stringify(element));
+            })
+        });
         this.isPut = true;
+    }
+
+    deleteData(document)
+    {
+        this.ngxPouchDBService.remove('main', document).subscribe(() => {
+            this.ngxPouchDBService.find('main', {
+                "selector": {
+                    "_id": {
+                       "$gt": null
+                    }
+                 }
+            }).subscribe((data) => {
+                this.allData = data.docs.map(element => JSON.stringify(element));
+            })
+        });
+        this.isDelete = true;
     }
 
     // getting the document with the id 'c5...' and putting the result into a string
@@ -86,7 +104,5 @@ export class AppComponent implements OnInit {
 
        this.getSimpleDocument();
        this.findNameByEyeColor();
-       this.displayAllData();
-
     }
 }
