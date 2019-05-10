@@ -20,17 +20,13 @@
     <label> favoriteFruit  : </label>
     <input type="text" name="favoriteFruit" [(ngModel)]="toPutInDataBase.favoriteFruit">
 </div><br><br>
+
 <button  (click)="putData()"> Put </button>
 <div *ngIf="isPut">
     <p> We can see your data has been put in the database, now you can try to delete in it with the function <b>delete</b> : </p>
     <div *ngFor="let people of allData">
-        <pre> {{ people }}</pre><br>
-        <button (click)="deleteData(people)"></button>
+        <pre> {{ people }}</pre>
+        <button (click)="deleteData(people)"> Delete </button><br>
     </div>
 </div>
-
-
-
-
-
 

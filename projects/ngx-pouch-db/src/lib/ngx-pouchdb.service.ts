@@ -53,7 +53,7 @@ export class NgxPouchDBService {
     }
 
     public remove(key: string, document: any) {
-        console.log(document);
+       // console.log(document);
 
         return from(this.databases[key].remove(document));
     }

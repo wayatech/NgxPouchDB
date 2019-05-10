@@ -33,10 +33,10 @@ export class Database {
     }
 
     public remove(document: any) {
-        let doc;
-        Object.assign(doc, document);
+        // let doc;
+        // Object.assign(doc, document);
 
-        return this.selectLocalOrRemote().remove(doc);
+        return this.selectLocalOrRemote().remove(document);
     }
 
     public replicateFromRemote() {
