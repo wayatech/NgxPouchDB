@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import {  NgxPouchDBService } from './ngx-pouchdb.service';
 import { of } from 'rxjs';
 import PouchDB from 'pouchdb';
+import { NgSwitch } from '@angular/common';
 
 
 
@@ -37,7 +38,7 @@ describe('NgxPouchDBService', () => {
     });
 
     it('should create a local database', (done) =>  {
-        const expectedResponse: Object = {
+        const expectedResponse: any = {
             adapter: "idb",
             auto_compaction: true,
             db_name: "test",
@@ -54,7 +55,7 @@ describe('NgxPouchDBService', () => {
     });
 
     it('should get a document', (done) => {
-        const expectedResponse: Object = {
+        const expectedResponse: any = {
             age: 26,
             eyeColor: "blue",
             favoriteFruit: "banana",
@@ -166,8 +167,70 @@ describe('NgxPouchDBService', () => {
 
     });
 
+    it('should update a document in the database', (done) => {
+
+        spyOn(ngxPouchDbService, 'get').and.callThrough();
+        spyOn(ngxPouchDbService, 'find').and.callThrough();
+
+        ngxPouchDbService.get('main', 'c5bc6467b3ac9d1140547d25f700ba73').subscribe((datag) => {
+             ngxPouchDbService.put('main', datag).subscribe((data) => {
+            expect(data._rev).not.toEqual(datag._rev);
+            done();
+            })
+
+        })
+
+    });
+
+    it('should be logged', (done) => {
+        spyOn(ngxPouchDbService, 'login').and.callThrough();
+        ngxPouchDbService.login('Alban', 'wayapass').then((data)=> {
+            expect(data.ok).toEqual(true);
+            done();
+        })
+    });
+
+    it('replicate from the remote database', (done) => {
+        spyOn(ngxPouchDbService, 'replicateFromRemote').and.callThrough();
+        ngxPouchDbService.replicateFromRemote('main').then((data)=> {
+            expect(data.ok).toEqual(true);
+            done();
+
+        })
+    });
 
 
+    it('should be synced', (done) => {
+        spyOn(ngxPouchDbService, 'sync').and.callThrough();
+        ngxPouchDbService.sync('main').then( (data) => {
+            expect(data.pull.ok).toEqual(true);
+            expect(data.push.ok).toEqual(true);
+            done();
+        })
+    });
+
+    it('should be true if logged', () => {
+        expect(NgxPouchDBService.isLogged()).toEqual(true);
+    });
+
+
+    it('should get the session' , () => {
+        ngxPouchDbService.getSession().then( (data) => {
+            console.log('session data',data);
+        })
+    })
+
+    it('should get the local session' , () => {
+        ngxPouchDbService.getLocalSession().then( (data) => {
+            console.log('local session data', data);
+        })
+    })
+
+    it('should put a user' , () => {
+        ngxPouchDbService.getLocalSession().then( (data) => {
+            console.log('local session data', data);
+        })
+    })
 
 
 
