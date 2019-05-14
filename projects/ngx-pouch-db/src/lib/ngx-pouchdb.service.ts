@@ -44,6 +44,7 @@ export class NgxPouchDBService {
         return new PouchDB(name, options);
     }
 
+
     public get(key: string, id: string) {
         return from(this.databases[key].get(id));
     }
@@ -79,9 +80,9 @@ export class NgxPouchDBService {
         return this.databases[key].query(view, queryParams);
     }
 
-    public replicateFromRemote(key: string) {
-        return this.databases[key].replicateFromRemote();
-    }
+        public replicateFromRemote(key: string) {
+            return this.databases[key].replicateFromRemote();
+        }
 
     public sync(key: string, live: boolean = false, liveAfterSync: boolean = false) {
         return this.databases[key].sync()
