@@ -1,6 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import PouchDB from 'pouchdb';
-import LoginPlugin from 'pouchdb-authentication';
+// import LoginPlugin from 'pouchdb-authentication';
 import FindPlugin from 'pouchdb-find';
 import { from } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -25,7 +25,7 @@ export class NgxPouchDBService {
         NgxPouchDBService.syncPending = new EventEmitter;
 
         PouchDB.plugin(FindPlugin);
-        PouchDB.plugin(LoginPlugin);
+        // PouchDB.plugin(LoginPlugin);
     }
 
     public init(key: string, localDB: PouchDB.Database, remoteDB: PouchDB.Database, sync) {
@@ -51,6 +51,10 @@ export class NgxPouchDBService {
 
     public put(key: string, document: any) {
         return from(this.databases[key].put(document)).pipe(map(data => { document._rev = data['rev']; return data; }));
+    }
+
+    public createIndex(key: string, object) {
+        return from(this.databases[key].createIndex(object));
     }
 
     public remove(key: string, document: any) {
@@ -109,76 +113,76 @@ export class NgxPouchDBService {
     }
 
     // User part
-    public login(username: string, password: string) {
-        const promise = this.databases['main'].remote.logIn(username, password);
+    // public login(username: string, password: string) {
+    //     const promise = this.databases['main'].remote.logIn(username, password);
 
-        promise
-            .then((session) => {
-                return this.databases['main'].remote.getUser(session.name);
-            })
-            // .then((user) => {
-            //     // this.setLocalUser(user);
-            // })
-        ;
+    //     promise
+    //         .then((session) => {
+    //             return this.databases['main'].remote.getUser(session.name);
+    //         })
+    //         // .then((user) => {
+    //         //     // this.setLocalUser(user);
+    //         // })
+    //     ;
 
-        return promise;
-    }
-    public logout() {
-        return this.databases['main'].remote.logOut()
-            .then(() => {
-                for (const key in this.databases) {
-                    this.databases[key].syncEvent.cancel();
-                }
-            })
-        ;
-    }
+    //     return promise;
+    // }
+    // public logout() {
+    //     return this.databases['main'].remote.logOut()
+    //         .then(() => {
+    //             for (const key in this.databases) {
+    //                 this.databases[key].syncEvent.cancel();
+    //             }
+    //         })
+    //     ;
+    // }
 
-    public getSession() {
-        return this.databases['main'].remote.getSession()
-            .then((session) => {
-                if (session.userCtx.name === null) {
-                    return null;
-                }
+    // public getSession() {
+    //     return this.databases['main'].remote.getSession()
+    //         .then((session) => {
+    //             if (session.userCtx.name === null) {
+    //                 return null;
+    //             }
 
-                return this.databases['main'].remote.getUser(session.userCtx.name);
-            })
-            .then((user) => {
-                return this.setLocalUser(user);
-            })
-        ;
-    }
+    //             return this.databases['main'].remote.getUser(session.userCtx.name);
+    //         })
+    //         .then((user) => {
+    //             return this.setLocalUser(user);
+    //         })
+    //     ;
+    // }
 
-    public getLocalSession() {
-        return this.databases['main'].local.get('_local/me');
-    }
+    // public getLocalSession() {
+    //     return this.databases['main'].local.get('_local/me');
+    // }
 
-    private setLocalUser(remoteUser) {
-        return this.databases['main'].local.get('_local/me')
-            .then((localUser) => {
-                const user = remoteUser;
-                user._id = localUser._id;
-                user._rev = localUser._rev;
+    // private setLocalUser(remoteUser) {
+    //     return this.databases['main'].local.get('_local/me')
+    //         .then((localUser) => {
+    //             const user = remoteUser;
+    //             user._id = localUser._id;
+    //             user._rev = localUser._rev;
 
-                return this.databases['main'].local.put(user);
-            }, () => {
-                const user = remoteUser;
-                user._id = '_local/me';
-                user._rev = null;
+    //             return this.databases['main'].local.put(user);
+    //         }, () => {
+    //             const user = remoteUser;
+    //             user._id = '_local/me';
+    //             user._rev = null;
 
-                return this.databases['main'].local.put(user);
-            })
-            .then(() => {
-                return this.databases['main'].local.get('_local/me');
-            })
-            .then(localUser => {
-                return NgxPouchDBService.user = localUser;
-            })
-        ;
-    }
+    //             return this.databases['main'].local.put(user);
+    //         })
+    //         .then(() => {
+    //             return this.databases['main'].local.get('_local/me');
+    //         })
+    //         .then(localUser => {
+    //             return NgxPouchDBService.user = localUser;
+    //         })
+    //     ;
+    // }
 
-    public putUser(metadata: object) {
-        return this.databases['main'].remote.putUser(NgxPouchDBService.user.name, {
-            metadata: metadata
-        });
-    }
+    // public putUser(metadata: object) {
+    //     return this.databases['main'].remote.putUser(NgxPouchDBService.user.name, {
+    //         metadata: metadata
+    //     });
+    // }
 }

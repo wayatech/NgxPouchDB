@@ -9,21 +9,21 @@ import { NgxPouchDBService } from 'projects/ngx-pouch-db/src/lib/ngx-pouchdb.ser
     styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-    structureDoc: String;
-    blueEyesPeople: String[] = [];
-    allData: String[] = [];
+    structureDoc: Object;
+    blueEyesPeople: Object[] = [];
+    allData: Object[] = [];
     idToDelete: string;
     revToDetelete: string;
 
     toPutInDataBase = {
-        age: "",
-        eyeColor: "",
+        age: '',
+        eyeColor: '',
         name: {
-            first: "",
-            last: ""
+            first: '',
+            last: ''
         },
-        favoriteFruit: ""
-    }
+        favoriteFruit: ''
+    };
 
     constructor(private ngxPouchDBService: NgxPouchDBService) {}
 
@@ -32,34 +32,32 @@ export class AppComponent implements OnInit {
     isDelete = false;
 
     // put data into the database
-    putData()
-    {
+    putData() {
         this.ngxPouchDBService.create('main', this.toPutInDataBase).subscribe(() => {
             this.ngxPouchDBService.find('main', {
-                "selector": {
-                    "_id": {
-                       "$gt": null
+                'selector': {
+                    '_id': {
+                       '$gt': null
                     }
                  }
             }).subscribe((data) => {
-                this.allData = data.docs.map(element => JSON.stringify(element));
-            })
+                this.allData = data.docs;
+            });
         });
         this.isPut = true;
     }
 
-    deleteData(document)
-    {
+    deleteData(document) {
         this.ngxPouchDBService.remove('main', document).subscribe(() => {
             this.ngxPouchDBService.find('main', {
-                "selector": {
-                    "_id": {
-                       "$gt": null
+                'selector': {
+                    '_id': {
+                       '$gt': null
                     }
                  }
             }).subscribe((data) => {
-                this.allData = data.docs.map(element => JSON.stringify(element));
-            })
+                this.allData = data.docs;
+            });
         });
         this.isDelete = true;
     }
@@ -68,21 +66,21 @@ export class AppComponent implements OnInit {
     getSimpleDocument() {
         this.ngxPouchDBService.get('main', 'c5bc6467b3ac9d1140547d25f70049f7').subscribe((data) => {
             this.structureDoc = JSON.stringify(data);
-        })
+        });
     }
 
     // finding all documents with eyeColar equaling blue
     findNameByEyeColor() {
         this.ngxPouchDBService.find('main',
         {
-            "selector": {
-                "eyeColor": {
-                   "$eq": "blue"
+            'selector': {
+                'eyeColor': {
+                   '$eq': 'blue'
                 }
              }
         }).subscribe((data) => {
-            this.blueEyesPeople = data.docs.map(element => JSON.stringify(element));
-        })
+            this.blueEyesPeople = data.docs;
+        });
     }
 
     ngOnInit() {

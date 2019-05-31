@@ -2,14 +2,14 @@ import { EventEmitter } from '@angular/core';
 import PouchDB from 'pouchdb';
 
 export class DatabaseSettings {
-    public preferLocal: boolean = false;
+    public preferLocal = false;
 }
 
 export class Database {
     public syncPending: EventEmitter<boolean>;
     public syncEvent;
 
-    public synced: boolean = false;
+    public synced = false;
 
     public constructor(public local: PouchDB.Database, public remote: PouchDB.Database, public settings?: DatabaseSettings) {
         this.settings = Object.assign(new DatabaseSettings, this.settings);
@@ -30,6 +30,10 @@ export class Database {
 
     public query(view: string, queryParams) {
         return this.selectLocalOrRemote().query(view, queryParams);
+    }
+
+    public createIndex(object) {
+        return this.selectLocalOrRemote().createIndex(object);
     }
 
     public remove(document: any) {
