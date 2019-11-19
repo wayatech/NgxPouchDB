@@ -26,4 +26,4 @@ jobs:
           registry-url: https://verdaccio.waya.tech/
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: 9soGDmR+cbJ52w1jTT7MWWnjFH0eLeoSTSgyVaME7/w=
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
