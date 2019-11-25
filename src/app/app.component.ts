@@ -84,22 +84,6 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.ngxPouchDBService.init(
-            'main',
-            this.ngxPouchDBService.createDatabase('ngxpouchdb', {auto_compaction: true}),
-            this.ngxPouchDBService.createDatabase('http://localhost:5984/ngxpouchdb', {
-                skip_setup: true,
-                // @ts-ignore
-                fetch (url, opts) {
-                    opts.credentials = 'include';
-
-                    // @ts-ignore
-                    return PouchDB.fetch(url, opts);
-                },
-            }),
-            {}
-        );
-
        this.getSimpleDocument();
        this.findNameByEyeColor();
     }

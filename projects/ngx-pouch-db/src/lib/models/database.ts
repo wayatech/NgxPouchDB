@@ -7,6 +7,7 @@ export class DatabaseSettings {
 
 export class Database {
     public syncPending: EventEmitter<boolean>;
+    public changes: EventEmitter<any>;
     public syncEvent;
 
     public synced = false;
@@ -28,8 +29,10 @@ export class Database {
         return this.selectLocalOrRemote().find(filter);
     }
 
-    public query(view: string, queryParams) {
-        return this.selectLocalOrRemote().query(view, queryParams);
+    public query(view: string, queryParams = {}) {
+        const paramDefault = { include_docs: true };
+
+        return this.selectLocalOrRemote().query(view, {...paramDefault, ...queryParams});
     }
 
     public createIndex(object) {
@@ -78,6 +81,20 @@ export class Database {
             .on('complete', () => {
                 this.synced = true;
                 this.syncPending.emit(false);
+            })
+        ;
+    }
+
+    public initChanges() {
+        this.changes = new EventEmitter<any>();
+
+        return this.remote.changes({
+            since: 'now',
+            live: true,
+            include_docs: true
+        })
+            .on('change', changes => {
+                this.changes.emit(changes);
             })
         ;
     }

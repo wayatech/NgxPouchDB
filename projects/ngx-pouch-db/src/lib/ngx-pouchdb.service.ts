@@ -3,7 +3,7 @@ import PouchDB from 'pouchdb';
 // import LoginPlugin from 'pouchdb-authentication';
 import FindPlugin from 'pouchdb-find';
 import { from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, pluck, tap } from 'rxjs/operators';
 import uuidv4 from 'uuid/v4';
 
 import { Database } from './models/database';
@@ -38,6 +38,12 @@ export class NgxPouchDBService {
         this.databases[key].syncPending.subscribe(() => {
             this.checkAllSync();
         });
+
+        this.databases[key].initChanges();
+    }
+
+    public db(key: string) {
+        return this.databases[key];
     }
 
     public createDatabase(name: string, options: Object) {
@@ -68,10 +74,10 @@ export class NgxPouchDBService {
             document._id = uuidv4();
         }
 
-        return this.put(key, document).pipe(map(data => {
+        return from(this.put(key, document).pipe(map(data => {
             delete(document._id);
             delete(document._rev);
-        }));
+        })));
     }
 
     public find(key: string, filter) {
@@ -80,13 +86,37 @@ export class NgxPouchDBService {
         return from(this.databases[key].find(filter));
     }
 
-    public query(key: string, view: string, queryParams) {
-        return this.databases[key].query(view, queryParams);
+    public query(key: string, view: string, queryParams = {}) {
+        return from(this.databases[key].query(view, queryParams))
+            .pipe(map(data => data.rows))
+            .pipe(map(data => {
+                const tmp = {};
+
+                data.forEach(el => {
+                    this.nestedCreation(tmp, el.key, el.doc);
+                });
+
+                console.log(tmp)
+                return Object.values(tmp);
+            }))
+            .pipe(tap(data => console.log(data)))
+        ;
     }
 
-        public replicateFromRemote(key: string) {
-            return this.databases[key].replicateFromRemote();
+    private nestedCreation(el: {}, path: string[], doc: {}): {} {
+        if (path.length === 1) {
+            return el[path[0]] = doc;
         }
+
+        let tmp = el[path[0]];
+        path.shift();
+
+        return this.nestedCreation(tmp, path, doc);
+    }
+
+    public replicateFromRemote(key: string) {
+        return this.databases[key].replicateFromRemote();
+    }
 
     public sync(key: string, live: boolean = false, liveAfterSync: boolean = false) {
         return this.databases[key].sync()

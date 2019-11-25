@@ -130,6 +130,7 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
+          "deleteOutputPath": false,
           "options": {
             "tsConfig": "projects/ngx-pouch-db/tsconfig.lib.json",
             "project": "projects/ngx-pouch-db/ng-package.json"

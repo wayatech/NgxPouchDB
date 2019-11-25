@@ -12,10 +12,14 @@ import { AppComponent } from './app.component';
     ],
     imports: [
         BrowserModule,
-        NgxPouchdbModule,
+        NgxPouchdbModule.forRoot({
+            databases: [
+                { key: 'main', localDB: 'ngxpouchdb', remoteDB: 'http://localhost:5984/ngxpouchdb' }
+            ]
+        }),
         FormsModule
     ],
     providers: [],
     bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

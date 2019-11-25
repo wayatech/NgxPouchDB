@@ -1,5 +1,5 @@
 {
-    "name": "@wt/ngx-pouchdb",
+    "name": "ngx-pouchdb",
     "version": "1.1.0",
     "peerDependencies": {
         "@angular/common": "^8.0.0",
