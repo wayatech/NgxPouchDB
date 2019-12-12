@@ -103,15 +103,27 @@ export class NgxPouchDBService {
         ;
     }
 
-    private nestedCreation(el: {}, path: string[], doc: {}): {} {
+    private nestedCreation(el: {}, path: string[], doc: {}) {
         if (path.length === 1) {
-            return el[path[0]] = doc;
+            if (/\[\]$/.test(path[0])) {
+                const arrayPath = path[0].replace('[]', '');
+                if (!el[arrayPath]) {
+                    el[arrayPath] = [];
+                }
+
+                // @ts-ignore
+                el[arrayPath].push(doc);
+            } else {
+                el[path[0]] = doc;
+            }
+
+            return;
         }
 
-        let tmp = el[path[0]];
+        const futur = el[path[0]];
         path.shift();
 
-        return this.nestedCreation(tmp, path, doc);
+        this.nestedCreation(futur, path, doc);
     }
 
     public replicateFromRemote(key: string) {
