@@ -30,7 +30,7 @@ export class Database {
     }
 
     public query(view: string, queryParams = {}) {
-        const paramDefault = { include_docs: true };
+        const paramDefault = { include_docs: true, attachments: true };
 
         return this.selectLocalOrRemote().query(view, {...paramDefault, ...queryParams});
     }
