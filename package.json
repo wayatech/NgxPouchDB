@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "build:ngxpouchdb": "ng build NgxPouchDB",
-    "publish": "npm publish dist/ngx-pouch-db/",
+    "publish": "yarn publish dist/ngx-pouch-db/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
