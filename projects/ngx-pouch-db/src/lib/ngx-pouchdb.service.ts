@@ -51,12 +51,12 @@ export class NgxPouchDBService {
     }
 
 
-    public get(key: string, id: string) {
-        return from(this.databases[key].get(id));
+    public get(key: string, id: string, queryParams = {}) {
+        return from(this.databases[key].get(id, queryParams));
     }
 
-    public put(key: string, document: any) {
-        return from(this.databases[key].put(document)).pipe(map(data => { document._rev = data['rev']; return data; }));
+    public put(key: string, document: any, queryParams = {}) {
+        return from(this.databases[key].put(document, queryParams)).pipe(map(data => { document._rev = data['rev']; return data; }));
     }
 
     public createIndex(key: string, object) {
