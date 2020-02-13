@@ -1,6 +1,6 @@
 {
   "name": "ngx-pouchdb",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "peerDependencies": {
     "@angular/common": "^8.0.0",
     "@angular/core": "^8.0.0",
