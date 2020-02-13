@@ -86,14 +86,14 @@ export class NgxPouchDBService {
         return from(this.databases[key].find(filter));
     }
 
-    public query(key: string, view: string, queryParams = {}) {
+    public query(key: string, view: string, queryParams = {}, overridePath?: Function) {
         return from(this.databases[key].query(view, queryParams))
             .pipe(map(data => data.rows))
             .pipe(map(data => {
                 const tmp = {};
 
                 data.forEach(el => {
-                    this.nestedCreation(tmp, el.key, el.doc);
+                    this.nestedCreation(tmp, overridePath ? overridePath(el.key) : el.key, el.doc);
                 });
 
                 console.log(tmp)

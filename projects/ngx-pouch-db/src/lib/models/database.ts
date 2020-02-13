@@ -17,12 +17,12 @@ export class Database {
         this.syncPending = new EventEmitter;
     }
 
-    public get(id: string) {
-        return this.selectLocalOrRemote().get(id);
+    public get(id: string, queryParams = {}) {
+        return this.selectLocalOrRemote().get(id, queryParams);
     }
 
-    public put(document: object) {
-        return this.selectLocalOrRemote().put(document);
+    public put(document: object, queryParams = {}) {
+        return this.selectLocalOrRemote().put(document, queryParams);
     }
 
     public find(filter: PouchDB.Find.FindRequest<{}>) {
