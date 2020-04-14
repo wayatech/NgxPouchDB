@@ -62,9 +62,11 @@ export class AppComponent implements OnInit {
     }
 
     deleteDatabase() {
-        this.ngxPouchDBService.removeDatabase('main').subscribe(() => {
-            this.isDelete = true;
+        this.ngxPouchDBService.removeDatabase('main', true).subscribe(() => {
+            console.log('Database removed');
         });
+
+        this.isDelete = true;
     }
 
     // getting the document with the id 'c5...' and putting the result into a string
