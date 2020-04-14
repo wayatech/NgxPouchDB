@@ -50,6 +50,9 @@ export class NgxPouchDBService {
         return new PouchDB(name, options);
     }
 
+    public removeDatabase(key: string) {
+        return from(this.databases[key].local.destroy());
+    }
 
     public get(key: string, id: string, queryParams = {}) {
         return from(this.databases[key].get(id, queryParams));

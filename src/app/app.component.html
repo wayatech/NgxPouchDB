@@ -25,11 +25,17 @@
     </div><br><br>
 
     <button  (click)="putData()"> Put </button>
+
     <div *ngIf="isPut">
         <p> We can see your data has been put in the database, now you can try to delete in it with the function <b>delete</b> : </p>
         <div *ngFor="let people of allData">
             <pre> {{ people | json }}</pre>
             <button (click)="deleteData(people)"> Delete </button><br>
+        </div>
+
+        <p> You can also delete the entire <b>local</b> database with the function <b>deleteDatabase</b> : </p>
+        <div>
+            <button (click)="deleteDatabase()"> Delete database</button><br>
         </div>
     </div>
 </main>

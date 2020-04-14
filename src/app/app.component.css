@@ -4,4 +4,9 @@ header {
     background-color: blue;
     box-sizing: border-box;
     display: flex;
+    justify-content: center;
+}
+
+main {
+    padding: 10px;
 }
