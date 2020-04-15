@@ -2,7 +2,6 @@ import { Component, OnInit, Input } from '@angular/core';
 import PouchDB from 'pouchdb';
 import { NgxPouchDBService } from 'projects/ngx-pouch-db/src/lib/ngx-pouchdb.service';
 
-
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
@@ -59,6 +58,14 @@ export class AppComponent implements OnInit {
                 this.allData = data.docs;
             });
         });
+        this.isDelete = true;
+    }
+
+    deleteDatabase() {
+        this.ngxPouchDBService.removeDatabase('main', true).subscribe(() => {
+            console.log('Database removed');
+        });
+
         this.isDelete = true;
     }
 

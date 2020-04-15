@@ -2,7 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import PouchDB from 'pouchdb';
 // import LoginPlugin from 'pouchdb-authentication';
 import FindPlugin from 'pouchdb-find';
-import { from } from 'rxjs';
+import { from, of } from 'rxjs';
 import { map, pluck, tap } from 'rxjs/operators';
 import uuidv4 from 'uuid/v4';
 
@@ -50,6 +50,17 @@ export class NgxPouchDBService {
         return new PouchDB(name, options);
     }
 
+    public removeDatabase(key: string, remote: boolean = false) {
+        return from(this.databases[key].local.destroy())
+            .pipe(map(data => {
+
+                if (remote) {
+                    return from(this.databases[key].remote.destroy());
+                }
+
+                return of(data);
+            }));
+    }
 
     public get(key: string, id: string, queryParams = {}) {
         return from(this.databases[key].get(id, queryParams));
