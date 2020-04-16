@@ -1,13 +1,13 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import PouchDB from 'pouchdb';
-// import LoginPlugin from 'pouchdb-authentication';
 import FindPlugin from 'pouchdb-find';
-import { from, of } from 'rxjs';
-import { map, pluck, tap } from 'rxjs/operators';
+import { defer, forkJoin, from, iif, of, empty } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import uuidv4 from 'uuid/v4';
 
 import { Database } from './models/database';
 
+// import LoginPlugin from 'pouchdb-authentication';
 @Injectable({
     providedIn: 'root'
 })
@@ -50,15 +50,28 @@ export class NgxPouchDBService {
         return new PouchDB(name, options);
     }
 
-    public removeDatabase(key: string, remote: boolean = false) {
-        return from(this.databases[key].local.destroy())
-            .pipe(map(data => {
+    public removeDatabase(key: string, local = true, remote = true) {
+        if (!local && !remote) {
+            throw new Error('You must pass local or remote to true to delete at least one database');
+        }
 
-                if (remote) {
-                    return from(this.databases[key].remote.destroy());
+        remote = false;
+        return forkJoin({
+            local: iif(() => local && !!this.databases[key].local, defer(() => from(this.databases[key].local.destroy())), of(null)),
+            remote: iif(() => remote && !!this.databases[key].remote, defer(() => from(this.databases[key].remote.destroy())), of(null))
+        })
+            .pipe(tap(responses => {
+                if (responses.local) {
+                    this.databases[key].local = null;
                 }
 
-                return of(data);
+                if (responses.remote) {
+                    this.databases[key].remote = null;
+                }
+
+                if (!this.databases[key].local && !this.databases[key].remote) {
+                    delete this.databases[key];
+                }
             }));
     }
 
@@ -75,8 +88,6 @@ export class NgxPouchDBService {
     }
 
     public remove(key: string, document: any) {
-       // console.log(document);
-
         return from(this.databases[key].remove(document));
     }
 
@@ -86,8 +97,8 @@ export class NgxPouchDBService {
         }
 
         return from(this.put(key, document).pipe(map(data => {
-            delete(document._id);
-            delete(document._rev);
+            delete (document._id);
+            delete (document._rev);
         })));
     }
 
@@ -111,7 +122,7 @@ export class NgxPouchDBService {
                 return Object.values(tmp);
             }))
             .pipe(tap(data => console.log(data)))
-        ;
+            ;
     }
 
     private nestedCreation(el: {}, path: string[], doc: {}) {
@@ -148,7 +159,7 @@ export class NgxPouchDBService {
                     this.databases[key].sync(true, true);
                 }
             })
-        ;
+            ;
     }
 
     private checkAllSync() {

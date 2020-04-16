@@ -1,41 +1,22 @@
 <header>
     <h1> Welcome to this tutorial of NgxPouchDb ! </h1>
+    <button (click)="deleteDatabase()"> Delete database</button>
 </header>
 
 <main>
-    <p> To begin, we will display the structure of the documents by getting a document with the function <b>get </b> :  </p>
-    <pre>{{ structureDoc  }} </pre><br><br>
-
-    <p> Then let's get the people who have blue eyes in my database using the function <b> find </b> : </p>
-    <pre *ngFor="let people of blueEyesPeople"> {{ people }} </pre><br><br>
-
-    <p> Now, we will put a new document in the database with the function <b> put </b> and get him with the function <b> find : </b></p>
-    <p> Write the informations to put in the database : </p>
-    <div style="display: inline-grid">
-        <label> age  : </label>
-        <input type="text" name="age" [(ngModel)]="toPutInDataBase.age">
-        <label> eyeColor  : </label>
-        <input type="text" name="eyeColor" [(ngModel)]="toPutInDataBase.eyeColor">
-        <label> firstName  : </label>
-        <input type="text" name="firstName" [(ngModel)]="toPutInDataBase.name.first">
-        <label> lastName  : </label>
-        <input type="text" name="lastName" [(ngModel)]="toPutInDataBase.name.last">
-        <label> favoriteFruit  : </label>
-        <input type="text" name="favoriteFruit" [(ngModel)]="toPutInDataBase.favoriteFruit">
-    </div><br><br>
-
-    <button  (click)="putData()"> Put </button>
-
-    <div *ngIf="isPut">
-        <p> We can see your data has been put in the database, now you can try to delete in it with the function <b>delete</b> : </p>
-        <div *ngFor="let people of allData">
-            <pre> {{ people | json }}</pre>
-            <button (click)="deleteData(people)"> Delete </button><br>
+    <section id="availablePerson">
+        <h1>Available Person</h1>
+        <div *ngFor="let data of mockDatas">
+            <span>{{ data | json }}</span>
+            <button (click)="putData(data)">Add</button>
         </div>
+    </section>
 
-        <p> You can also delete the entire <b>local</b> database with the function <b>deleteDatabase</b> : </p>
-        <div>
-            <button (click)="deleteDatabase()"> Delete database</button><br>
+    <section id="listPerson">
+        <h1>Person in database</h1>
+        <div *ngFor="let data of listDatas">
+            <span>{{ data | json }}</span>
+            <button (click)="deleteData(data)">Remove</button>
         </div>
-    </div>
+    </section>
 </main>

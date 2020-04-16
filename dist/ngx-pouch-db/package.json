@@ -1,14 +1,14 @@
 {
   "name": "ngx-pouchdb",
-  "version": "1.6.5",
+  "version": "1.3.0",
   "peerDependencies": {
     "@angular/common": "^8.0.0",
     "@angular/core": "^8.0.0",
-    "@types/pouchdb": "^6.4.0",
     "pouchdb": "^7.1.1",
     "pouchdb-authentication": "^1.1.3",
     "pouchdb-find": "^7.1.1",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "@types/pouchdb": "^6.4.0"
   },
   "main": "bundles/ngx-pouchdb.umd.js",
   "module": "fesm5/ngx-pouchdb.js",
