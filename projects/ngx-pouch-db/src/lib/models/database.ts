@@ -100,7 +100,7 @@ export class Database {
     }
 
     private selectLocalOrRemote(): PouchDB.Database {
-        if (!navigator.onLine || this.synced) {
+        if (!navigator.onLine) {
             return this.local;
         }
 
