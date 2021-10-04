@@ -1,20 +1,27 @@
-import { EventEmitter } from '@angular/core';
 import PouchDB from 'pouchdb';
+import { BehaviorSubject, Subject } from 'rxjs';
+
+import { NgxPouchDBEvents } from '../ngx-pouchdb.events';
 
 export class DatabaseSettings {
-    public preferLocal = false;
+    public preferLocal? = false;
+    public syncAtStart? = false;
+    public liveSync? = false;
 }
 
 export class Database {
-    public syncPending: EventEmitter<boolean>;
-    public changes: EventEmitter<any>;
+    public changes: Subject<any>;
     public syncEvent;
 
-    public synced = false;
+    public synced = new BehaviorSubject(false);
+    public syncPending = new BehaviorSubject(false);
 
     public constructor(public local: PouchDB.Database, public remote: PouchDB.Database, public settings?: DatabaseSettings) {
         this.settings = Object.assign(new DatabaseSettings, this.settings);
-        this.syncPending = new EventEmitter;
+
+        if (this.settings.syncAtStart) {
+            this.sync(settings.liveSync);
+        }
     }
 
     public get(id: string, queryParams = {}) {
@@ -49,52 +56,58 @@ export class Database {
     public replicateFromRemote() {
         const promise = this.local.replicate.from(this.remote);
 
-        promise
-            .on('active', () => {
-                this.synced = false;
-                this.syncPending.emit(true);
-            })
-            .on('complete', () => {
-                this.synced = true;
-                this.syncPending.emit(false);
-            })
-            .on('error', () => {})
-        ;
+        // promise
+        //     .on('active', () => {
+        //         console.log('active');
+        //         this.synced.next(false);
+        //         this.syncPending.next(true);
+        //     })
+        //     .on('complete', () => {
+        //         console.log('complete');
+        //         this.synced.next(true);
+        //         this.syncPending.next(false);
+        //     })
+        //     .on('error', () => {})
+        // ;
 
         return promise;
     }
 
-    public sync(live: boolean = false, secondSync: boolean = false) {
-        return this.syncEvent = this.local.sync(this.remote, { live: live, retry: live })
-            .on('active', () => {
-                if (secondSync) { return; }
-                this.synced = false;
-                this.syncPending.emit(true);
-            })
-            .on('change', change => {
-                this.synced = true;
-                this.syncPending.emit(false);
+    public liveSync() {
+        if (!navigator.onLine) {
+            console.error('You are offline');
+            return;
+        }
+
+        return this.syncEvent = this.local.sync(this.remote, { live: true, retry: true })
+            .on('change', data => {
+                NgxPouchDBEvents.changes.next(data);
             })
             .on('error', error => {
                 console.error(JSON.stringify(error));
             })
-            .on('complete', () => {
-                this.synced = true;
-                this.syncPending.emit(false);
-            })
         ;
     }
 
-    public initChanges() {
-        this.changes = new EventEmitter<any>();
+    public sync(runLiveSyncAfterComplete: boolean = false) {
+        if (!navigator.onLine) {
+            console.error('You are offline');
+            return;
+        }
 
-        return this.remote.changes({
-            since: 'now',
-            live: true,
-            include_docs: true
-        })
-            .on('change', changes => {
-                this.changes.emit(changes);
+        this.syncPending.next(true);
+
+        return this.syncEvent = this.local.sync(this.remote, { live: false, retry: true })
+            .on('error', error => {
+                console.error("error", JSON.stringify(error));
+            })
+            .on('complete', () => {
+                this.synced.next(true);
+                this.syncPending.next(false);
+
+                if (runLiveSyncAfterComplete) {
+                    this.liveSync();
+                }
             })
         ;
     }

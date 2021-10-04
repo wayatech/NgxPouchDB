@@ -1,10 +1,11 @@
 import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core';
 import * as PouchDB from 'pouchdb/dist/pouchdb';
+import { DatabaseSettings } from './models/database';
 
 import { NgxPouchDBService } from './ngx-pouchdb.service';
 
 export class NgxPouchDBConfig {
-    databases: {key: string, localDB: string, remoteDB: string}[];
+    databases: {key: string, localDB: string, remoteDB: string, settings?: DatabaseSettings}[];
 }
 
 
@@ -33,7 +34,7 @@ export class NgxPouchdbModule {
                             return PouchDB.fetch(url, opts);
                         },
                     }),
-                    {}
+                    database.settings
                 )
             })
         }

@@ -1,9 +1,16 @@
 <header>
-    <h1> Welcome to this tutorial of NgxPouchDb ! </h1>
-    <button (click)="deleteDatabase()"> Delete database</button>
+    <h1> Welcome to this tutorial of NgxPouchDB ! </h1>
+    <button (click)="deleteDatabase(true, false)">Delete local database</button>
+    <button (click)="deleteDatabase(false, true)">Delete remote database</button>
 </header>
 
 <main>
+    <header>
+      Sync pending: {{ syncPending }}
+      <hr>
+      Sync: {{synced }}
+    </header>
+
     <section id="availablePerson">
         <h1>Available Person</h1>
         <div *ngFor="let data of mockDatas">
@@ -13,7 +20,12 @@
     </section>
 
     <section id="listPerson">
-        <h1>Person in database</h1>
+        <header>
+            <h1>Person in database</h1>
+            <button (click)="listDatas = []">Clear</button>
+            <button (click)="refresh()">Refresh</button>
+            <button (click)="getData()">GetData</button>
+        </header>
         <div *ngFor="let data of listDatas">
             <span>{{ data | json }}</span>
             <button (click)="deleteData(data)">Remove</button>

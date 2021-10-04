@@ -1,19 +1,18 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import PouchDB from 'pouchdb';
 import FindPlugin from 'pouchdb-find';
-import { defer, forkJoin, from, iif, of, empty } from 'rxjs';
+import { BehaviorSubject, defer, forkJoin, from, iif, of, Subject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import uuidv4 from 'uuid/v4';
 
-import { Database } from './models/database';
+import { Database, DatabaseSettings } from './models/database';
+import { NgxPouchDBEvents } from './ngx-pouchdb.events';
 
 // import LoginPlugin from 'pouchdb-authentication';
 @Injectable({
     providedIn: 'root'
 })
 export class NgxPouchDBService {
-    public static syncPending: EventEmitter<boolean> = undefined;
-
     public static user: any = undefined;
     public databases: { [key: string]: Database; } = {};
 
@@ -22,24 +21,26 @@ export class NgxPouchDBService {
     }
 
     public constructor() {
-        NgxPouchDBService.syncPending = new EventEmitter;
-
         PouchDB.plugin(FindPlugin);
         // PouchDB.plugin(LoginPlugin);
+
+        window.addEventListener('offline', () => {
+            NgxPouchDBEvents.syncPending.next(false);
+            NgxPouchDBEvents.synced.next(false);
+        });
     }
 
-    public init(key: string, localDB: PouchDB.Database, remoteDB: PouchDB.Database, sync) {
+    public init(key: string, localDB: PouchDB.Database, remoteDB: PouchDB.Database, settings: DatabaseSettings) {
         if (Object.keys(this.databases).length === 0 && key !== 'main') {
             throw new Error('First database must named "main"');
         }
 
-        this.databases[key] = new Database(localDB, remoteDB, sync);
+        this.databases[key] = new Database(localDB, remoteDB, settings);
 
-        this.databases[key].syncPending.subscribe(() => {
+        this.databases[key].syncPending.subscribe(data => {
             this.checkAllSync();
+            this.checkAllSyncPending();
         });
-
-        this.databases[key].initChanges();
     }
 
     public db(key: string) {
@@ -62,6 +63,7 @@ export class NgxPouchDBService {
         })
             .pipe(tap(responses => {
                 if (responses.local) {
+                    this.databases[key].synced.next(false);
                     this.databases[key].local = null;
                 }
 
@@ -152,28 +154,36 @@ export class NgxPouchDBService {
         return this.databases[key].replicateFromRemote();
     }
 
-    public sync(key: string, live: boolean = false, liveAfterSync: boolean = false) {
-        return this.databases[key].sync()
-            .on('complete', () => {
-                if (!live && liveAfterSync) {
-                    this.databases[key].sync(true, true);
-                }
-            })
-            ;
+    public sync(key: string, liveAfterSync: boolean = false) {
+        return this.databases[key].sync(liveAfterSync);
     }
 
     private checkAllSync() {
         let sync = true;
 
         for (const key in this.databases) {
-            if (!this.databases[key].synced) {
+            if (!this.databases[key].synced.value) {
                 sync = false;
 
                 break;
             }
         }
 
-        NgxPouchDBService.syncPending.emit(sync);
+        NgxPouchDBEvents.synced.next(sync);
+    }
+
+    private checkAllSyncPending() {
+        let syncPending = true;
+
+        for (const key in this.databases) {
+            if (!this.databases[key].syncPending.value) {
+                syncPending = false;
+
+                break;
+            }
+        }
+
+        NgxPouchDBEvents.syncPending.next(syncPending);
     }
 
     // User part

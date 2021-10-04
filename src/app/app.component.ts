@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgxPouchDBService } from 'projects/ngx-pouch-db/src/lib/ngx-pouchdb.service';
-import { flatMap } from 'rxjs/operators';
+import { NgxPouchDBEvents } from 'projects/ngx-pouch-db/src/public_api';
+import { BehaviorSubject, of } from 'rxjs';
+import { delay, flatMap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-root',
@@ -13,6 +15,8 @@ export class AppComponent implements OnInit {
     allData: Object[] = [];
     idToDelete: string;
     revToDetelete: string;
+    syncPending: boolean;
+    synced: boolean;
 
     step = 1;
 
@@ -45,9 +49,24 @@ export class AppComponent implements OnInit {
 
     public listDatas = [];
 
-    constructor(private ngxPouchDBService: NgxPouchDBService) { }
+    constructor(private ngxPouchDBService: NgxPouchDBService, private cdr: ChangeDetectorRef) { }
 
     ngOnInit() {
+        NgxPouchDBEvents.synced.subscribe(data => {
+            this.synced = data;
+        });
+        NgxPouchDBEvents.syncPending.subscribe(data => {
+            this.syncPending = data;
+        })
+
+
+        this.getData();
+        NgxPouchDBEvents.changes.subscribe(data => {
+            this.getData();
+        })
+    }
+
+    getData() {
         this.ngxPouchDBService.find('main', {
             'selector': {
                 '_id': {
@@ -57,6 +76,7 @@ export class AppComponent implements OnInit {
         })
             .subscribe((response) => {
                 this.listDatas = response.docs;
+                this.cdr.detectChanges();
             });
     }
 
@@ -67,34 +87,20 @@ export class AppComponent implements OnInit {
     // put data into the database
     putData(data) {
         this.ngxPouchDBService.create('main', data)
-            .pipe(flatMap(inner => this.ngxPouchDBService.find('main', {
-                'selector': {
-                    '_id': {
-                        '$gt': null
-                    }
-                }
-            })))
-            .subscribe((response) => {
-                this.listDatas = response.docs;
+            .subscribe(() => {
+                this.getData();
             });
     }
 
     deleteData(document) {
         this.ngxPouchDBService.remove('main', document)
-            .pipe(flatMap(inner => this.ngxPouchDBService.find('main', {
-                'selector': {
-                    '_id': {
-                        '$gt': null
-                    }
-                }
-            })))
-            .subscribe((response) => {
-                this.listDatas = response.docs;
-            });
+        .subscribe(() => {
+            this.getData();
+        });
     }
 
-    deleteDatabase() {
-        this.ngxPouchDBService.removeDatabase('main', true, true).subscribe((response) => {
+    deleteDatabase(local: boolean = true, remote: boolean = true) {
+        this.ngxPouchDBService.removeDatabase('main', local, remote).subscribe((response) => {
             console.log('Database removed', response);
         });
 
@@ -120,5 +126,10 @@ export class AppComponent implements OnInit {
             }).subscribe((data) => {
                 this.blueEyesPeople = data.docs;
             });
+    }
+
+    refresh() {
+        console.log('refresh');
+        this.ngxPouchDBService.sync('main', false);
     }
 }

@@ -14,7 +14,7 @@ import { AppComponent } from './app.component';
         BrowserModule,
         NgxPouchdbModule.forRoot({
             databases: [
-                { key: 'main', localDB: 'ngxpouchdb', remoteDB: 'http://localhost:5984/ngxpouchdb' }
+                { key: 'main', localDB: 'ngxpouchdb', remoteDB: 'http://localhost:5984/ngxpouchdb', settings: {syncAtStart: true, liveSync: true} }
             ]
         }),
         FormsModule
